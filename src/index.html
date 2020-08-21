@@ -56,6 +56,18 @@
       box-shadow: 6px 6px 12px white;
     }
 
+    .top {
+      top: 20px;
+      left: 20px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      padding-left: 20px;
+      padding-right: 20px;
+      position: absolute;
+      width: 100%;
+    }
+
     .centered {
       left: 50%;
       position: absolute;
@@ -73,10 +85,10 @@
     }
 
     #pill-title {
-      left: 20px;
+      /* left: 20px; */
       opacity: 0.3;
-      position: absolute;
-      top: 20px;
+      position: relative;
+      /* top: 20px; */
       transition: all 0.2s ease-in-out;
     }
 
@@ -90,11 +102,28 @@
       text-decoration: none;
     }
 
+    #pill-slider {
+      right: 20px;
+      opacity: 0.3;
+      position: relative;
+      /* top: 20px; */
+      transition: all 0.2s ease-in-out;
+    }
+
+    #pill-slider:hover {
+      box-shadow: 6px 6px 12px white;
+      opacity: 1;
+    }
+
     #pill-drop {
       pointer-events: none;
     }
 
     #pill-play {
+      min-width: 200px;
+    }
+
+    #pill-mode {
       min-width: 200px;
     }
 
@@ -125,6 +154,12 @@
         transform: translate(-50%);
       }
 
+      #pill-mode {
+        left: 20%;
+        order: 2;
+        width: 100%;
+      }
+
       #pill-play {
         margin-top: 20px;
         order: 2;
@@ -141,6 +176,11 @@
         flex-grow: 1;
       }
 
+      .top {
+        align-items: center;
+        flex-direction: column;
+      }
+
       .bottom {
         align-items: center;
         flex-direction: column;
@@ -152,7 +192,28 @@
 <body>
   <div id="canvases"></div>
 
-  <div id="pill-title" class="pill"><a target="blank" href="https://github.com/philippfromme/granular-js-demo">granular-js demo</a></div>
+  <div class="top">
+    <div id="pill-title" class="pill"><a target="blank" href="https://github.com/philippfromme/granular-js-demo">granular-js demo</a></div>
+    
+    <div id="pill-slider" class="pill">
+      <span class="label">Grain Density</span>
+      <input type="range" min="1" max="100" value="50" class="slider" id="density-slider">
+    </div>
+    <div id="pill-slider" class="pill">
+      <span class="label">Grain Spread</span>
+      <input type="range" min="1" max="100" value="50" class="slider" id="spread-slider">
+    </div>
+    
+    <div id="pill-slider" class="pill">
+      <span class="label">Reverb D/W</span>
+      <input type="range" min="1" max="100" value="50" class="slider" id="reverb-slider">
+    </div>
+    <div id="pill-slider" class="pill">
+      <span class="label">Delay D/W</span>
+      <input type="range" min="1" max="100" value="50" class="slider" id="delay-slider">
+    </div>
+    
+  </div>
 
   <div class="centered">
     <div id="pill-drop" class="pill animated pulse infinite hidden">Drop Audio</div>
@@ -161,6 +222,8 @@
 
   <div class="bottom">
     <button id="pill-play" class="pill pill-inverted pill-button inactive">Play!</button>
+
+    <div id="pill-mode" class="pill pill-button">Auto Mode</div>
 
     <div id="presets">
       <span class="label">Presets</span>

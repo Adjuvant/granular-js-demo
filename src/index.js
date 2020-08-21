@@ -26,12 +26,25 @@ const PRESETS = [
   {
     name: 4,
     url: './example4.mp3'
+  },
+  {
+    name: 5,
+    url: './example5.mp3'
+  },
+  {
+    name: 6,
+    url: './example6.mp3'
   }
 ];
 
 const pillPlay = document.getElementById('pill-play'),
+      pillMode = document.getElementById('pill-mode'),
       pillLoading = document.getElementById('pill-loading'),
       pillTitle = document.getElementById('pill-title'),
+      reverbSlider = document.getElementById("reverb-slider"),
+      delaySlider = document.getElementById("delay-slider"),
+      densitySlider = document.getElementById("density-slider"),
+      spreadSlider = document.getElementById("spread-slider"),
       canvases = document.getElementById('canvases'),
       presets = document.getElementById('presets');
 
@@ -91,9 +104,10 @@ async function loadPreset({ name, url }) {
   }
 
   const audioBuffer = await granular.setBuffer(data);
-
+  // console.log("Sample duration: " + audioBuffer.duration + ". Sample length: " + audioBuffer.length);
+  
   AUDIO_BUFFER_CACHE[ name ] = audioBuffer;
-
+  
   pillLoading.classList.add('hidden');
   pillPlay.classList.remove('inactive');
   presets.classList.remove('inactive');
@@ -130,6 +144,9 @@ function createPresets(data, text) {
 
 async function init() {
   const audioContext = p5.prototype.getAudioContext();
+  if (audioContext.state !== 'running') {
+    audioContext.resume();
+  }
 
   granular = new Granular({
     audioContext,
@@ -142,12 +159,32 @@ async function init() {
     pitch: 1
   });
 
+  densitySlider.oninput = function() {
+    granular.set({
+      density: this.value/100.0
+    });
+  }
+
+  spreadSlider.oninput = function() {
+    granular.set({
+      spread: this.value/100.0
+    });
+  }
+
   const delay = new p5.Delay();
+
+  delaySlider.oninput = function() {
+    delay.drywet(this.value/100.0);
+  }
 
   delay.process(granular, 0.5, 0.5, 3000); // source, delayTime, feedback, filter frequency
 
   const reverb = new p5.Reverb();
-
+  
+  reverbSlider.oninput = function() {
+    reverb.drywet(this.value/100.0);
+  }
+  
   // due to a bug setting parameters will throw error
   // https://github.com/processing/p5.js/issues/3090
   reverb.process(delay); // source, reverbTime, decayRate in %, reverse
@@ -168,11 +205,12 @@ async function init() {
     loadUserData(data);
   });
 
+  autoPlay = new AutoPlay(granular);
+
   granular.on('bufferSet', ({ buffer }) => {
     waveform.draw(buffer);
+    autoPlay.setBufferTime(buffer.duration);
   });
-
-  autoPlay = new AutoPlay(granular);
 
   pillPlay.addEventListener('click', (event) => {
     event.preventDefault();
@@ -203,6 +241,16 @@ async function init() {
         pillPlay.textContent = 'Stop';
       }
     }
+  });
+
+  // Switch the mode of the play module.
+  pillMode.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    // autoPlay
+    autoPlay.switchMode();
+    pillMode.textContent = autoPlay.getMode() ? "Auto" : "Linear";
   });
 
   createPresets();
